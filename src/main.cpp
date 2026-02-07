@@ -17,6 +17,7 @@ pros::Controller controller(pros::E_CONTROLLER_MASTER);
 bool tonguePress = false;
 bool wingLift = false;
 bool intakeLift = false;
+bool indexing = false;
 
 double BOT_WIDTH = 18;
 double BOT_HEIGHT = 18;
@@ -356,8 +357,8 @@ void initialize() {
             pros::screen::print(TEXT_MEDIUM, 2, "Th: %.2f", chassis.getPose().theta);
 			pros::screen::print(TEXT_MEDIUM, 3, "wing: %d", wingLift);
 			pros::screen::print(TEXT_MEDIUM, 4, "scraper: %d", tonguePress);
-			pros::screen::print(TEXT_MEDIUM, 5, "index: %d", intakeLift);
-			pros::screen::print(TEXT_MEDIUM, 6, "test");
+			pros::screen::print(TEXT_MEDIUM, 5, "intake: %d", intakeLift);
+			pros::screen::print(TEXT_MEDIUM, 6, "index: %d", indexing);
 			// pros::screen::print(TEXT_MEDIUM, 3, "first: %.2f", (local.empty())? -10000.00 : local[0].x);
 			// pros::screen::print(TEXT_MEDIUM, 4, "init: %d", particles_snapshot.size());
 
@@ -449,8 +450,21 @@ void toggleIntake()
 {
 	intakeLift=!intakeLift;
 }
+void adjustIndex()
+{
+	indexer.set_value(!indexing);
+}
 void adjustIntake()
 {
+	if(intakeLift&&indexing){
+		indexing=false;
+		adjustIndex();
+		pros::delay(500);
+	}
+	// if(!intakeLift&&!indexing){
+	// 	indexing=true;
+
+	// }
 	intakeFinal.set_value(intakeLift);
 }
 
@@ -687,8 +701,10 @@ void opcontrol() {
 		if (master.get_digital(pros::E_CONTROLLER_DIGITAL_R1)){
 			// intakeIndex();
 			intakeHighgoal();
-			wingLift=false;
-			intakeLift=false;
+			// wingLift=false;
+			intakeLift=true;
+			indexing=false;
+
 		}
 		//reverse high goal
 		else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_R2)){
@@ -699,17 +715,19 @@ void opcontrol() {
 		}
 		else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_L1)){
 			intakeHighgoal();
-			intakeLift = true;
+			intakeLift = false;
+			indexing=true;
+			
 		}
 		else{
 			intakeStop();
 		}
-		if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_A )){
+		if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_RIGHT )){
 			toggleTongue();
 		}
-		if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_RIGHT )){
-			toggleIntake();
-		}
+		// if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_RIGHT )){
+		// 	toggleIntake();
+		// }
 		if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_Y)){
 			toggleWing();
 		}
@@ -719,6 +737,7 @@ void opcontrol() {
 		
 		adjustTongue();
 		adjustWing();
+		adjustIndex();
 		adjustIntake();
 		// moveIntake();
 		// mclLoop();
