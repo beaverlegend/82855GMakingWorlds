@@ -10,10 +10,10 @@
 #define DRIVE_RPM 450
 
 #define LEFT_FRONT_DRIVE 16
-#define LEFT_MIDDLE_DRIVE 17
-#define LEFT_BACK_DRIVE 18
+#define LEFT_MIDDLE_DRIVE -17
+#define LEFT_BACK_DRIVE -18
 
-#define RIGHT_FRONT_DRIVE 11 
+#define RIGHT_FRONT_DRIVE -11 
 #define RIGHT_MIDDLE_DRIVE 12
 #define RIGHT_BACK_DRIVE 13
 
@@ -21,7 +21,7 @@
 #define IMU 20
 
 
-#define IntakeRight 1
+#define IntakeRight -1
 #define IntakeLeft 10
 
 #define TONGUE 'A' // change this
