@@ -28,18 +28,18 @@
 #define WINGS 'B'
 #define INTAKE 'H'
 
-#define DIST_FRONT 11
-#define DIST_BACK 12
-#define DIST_LEFT 13
-#define DIST_RIGHT 14
+// #define DIST_FRONT 11
+// #define DIST_BACK 12
+// #define DIST_LEFT 13
+// #define DIST_RIGHT 14
 
 inline MockIMU imu(IMU, 359.0/ 360.0);
 inline pros::MotorGroup left_mg({LEFT_FRONT_DRIVE, LEFT_MIDDLE_DRIVE, LEFT_BACK_DRIVE}, pros::MotorGearset::blue);
 inline pros::MotorGroup right_mg({RIGHT_FRONT_DRIVE, RIGHT_MIDDLE_DRIVE, RIGHT_BACK_DRIVE}, pros::MotorGearset::blue);
 inline pros::MotorGroup Intake_High_mg({IntakeRight, IntakeLeft});
 
-inline pros::MotorGroup Intake_Bottom({-IntakeTopRoller});
-inline pros::MotorGroup Intake_Top({-IntakeLastWheel});
+// inline pros::MotorGroup Intake_Bottom({-IntakeTopRoller});
+// inline pros::MotorGroup Intake_Top({-IntakeLastWheel});
 inline pros::Rotation vertical_odom(VERTICAL_ODOM);
 
 // pneumatics
@@ -49,7 +49,7 @@ inline pros::adi::Pneumatics wings(WINGS, false);
 inline pros::adi::Pneumatics intakeFinal(INTAKE, false);
 
 // distance sensors
-inline pros::Distance dist_front(DIST_FRONT);
-inline pros::Distance dist_back(DIST_BACK);
-inline pros::Distance dist_left(DIST_LEFT);
-inline pros::Distance dist_right(DIST_RIGHT);
+// inline pros::Distance dist_front(DIST_FRONT);
+// inline pros::Distance dist_back(DIST_BACK);
+// inline pros::Distance dist_left(DIST_LEFT);
+// inline pros::Distance dist_right(DIST_RIGHT);
