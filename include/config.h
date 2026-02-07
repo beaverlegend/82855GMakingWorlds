@@ -24,9 +24,10 @@
 #define IntakeRight -1
 #define IntakeLeft 10
 
-#define TONGUE 'A' // change this
-#define WINGS 'B'
-#define INTAKE 'H'
+#define TONGUE 'H' // change this
+#define WINGS 'A'
+#define INDEX 'E'
+#define INTAKE 'G'
 
 // #define DIST_FRONT 11
 // #define DIST_BACK 12
@@ -46,6 +47,7 @@ inline pros::Rotation vertical_odom(VERTICAL_ODOM);
 
 inline pros::adi::Pneumatics tongue(TONGUE, false);
 inline pros::adi::Pneumatics wings(WINGS, false);
+inline pros::adi::Pneumatics indexer(INDEX, false);
 inline pros::adi::Pneumatics intakeFinal(INTAKE, false);
 
 // distance sensors
