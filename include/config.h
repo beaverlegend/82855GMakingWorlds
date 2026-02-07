@@ -9,24 +9,24 @@
 #define WHEEL_DIAMETER 3.25
 #define DRIVE_RPM 450
 
-#define LEFT_FRONT_DRIVE 16
+#define LEFT_FRONT_DRIVE -16
 #define LEFT_MIDDLE_DRIVE -17
 #define LEFT_BACK_DRIVE -18
 
-#define RIGHT_FRONT_DRIVE -11 
-#define RIGHT_MIDDLE_DRIVE 12
+#define RIGHT_FRONT_DRIVE 11 
+#define RIGHT_MIDDLE_DRIVE -12
 #define RIGHT_BACK_DRIVE 13
 
-#define VERTICAL_ODOM -10
+#define VERTICAL_ODOM 9
 #define IMU 20
 
 
 #define IntakeRight -1
 #define IntakeLeft 10
 
-#define TONGUE 'A' // change this
-#define WINGS 'B'
-#define INTAKE 'H'
+#define TONGUE 'H' // change this
+#define WINGS 'G'
+#define INTAKE 'E'
 
 // #define DIST_FRONT 11
 // #define DIST_BACK 12
