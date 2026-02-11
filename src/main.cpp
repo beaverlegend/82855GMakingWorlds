@@ -133,7 +133,7 @@ lemlib::OdomSensors sensors(&vertical_tracking_wheel, // vertical tracking wheel
 // lateral PID controller
 lemlib::ControllerSettings lateral_controller(5,   // proportional gain (kP)
 											  0,   // integral gain (kI)
-											  32.0,  // derivative gain (kD)
+											  18,  // derivative gain (kD)
 											  0,   // anti windup
 											  0,   // small error range, in inches
 											  100, // small error range timeout, in milliseconds
@@ -145,7 +145,7 @@ lemlib::ControllerSettings lateral_controller(5,   // proportional gain (kP)
 // angular PID controller
 lemlib::ControllerSettings angular_controller(5, // proportional gain (kP)3.2  5.8
 											  0,   // integral gain (kI)
-											  37,  // derivative gain (kD)28 39.5
+											  15,  // derivative gain (kD)28 39.5
 											  0,   // anti windup
 											  0,   // small error range, in degrees
 											  0,   // small error range timeout, in milliseconds
@@ -478,12 +478,13 @@ void intakeHighgoal()
 	// adjustIntake();
 }
 
-// void intakeMiddlegoal()
-// {
-// 	Intake_High_mg.move(-110);
-// 	intakeLift = false;
-// 	adjustIntake();
-// }
+void intakeMiddlegoal()
+{
+	Intake_High_mg.move(-127);
+	intakeLift = false;
+	indexing=false;
+	// adjustIntake();
+}
 
 void IntakeSlowReverse(){
 	speed = -100;
@@ -594,13 +595,68 @@ void redBottom(){
 }
 
 void justinsawp(){
-	
+	chassis.setPose(-48, -15, 180);
+    chassis.moveToPoint(-48, -47, 400);
+    pros::delay(1000);
+    intakeHighgoal();
+    chassis.turnToHeading(270, 300);
+    pros::delay(1000);
+    tonguePress=true;
+    adjustTongue();
+    indexing=true;
+    adjustIndex();
+    chassis.moveToPoint(-58, -47, 300);
+    pros::delay(3000);
+    intakeLift=true;
+    adjustIntake();
+    chassis.moveToPoint(-30, 47, 500, {.forwards=false});
+    indexing=false;
+    adjustIndex();
+    pros::delay(10000);
+    // tonguePress
+    //raise index
+
+    /*
+    chassis.moveToPoint(-35, -47, 200);
+    intakeLift=false;
+    adjustIntake();
+    pros::delay(200);
+    chassis.turnToHeading(30, 300);
+    pros::delay(300);
+    chassis.moveToPoint(-22, -23, 700);
+    pros::delay(600);
+    chassis.turnToHeading(0, 300);
+    pros::delay(500);
+    chassis.moveToPoint(-23.5, 23, 300);
+    pros::delay(500);
+    chassis.turnToHeading(310, 500);
+    pros::delay(500);
+    chassis.moveToPoint(-10, 10, 500, {.forwards=false});
+    pros::delay(500);
+    //lower index
+    pros::delay(2000);
+    chassis.moveToPoint(-47, 46, 700);
+    pros::delay(500);
+    chassis.turnToHeading(270, 500);
+    //raise index
+    pros::delay(500);
+    //scraper down
+    chassis.moveToPoint(-58, 46, 500);
+    pros::delay(3000);
+    intakeLift=true;
+    adjustIntake();
+    chassis.moveToPoint(-30, 46, 500);
+    pros::delay(300);
+    //lower index
+    */
 }
 
 void autonomous() {
 	chassis.setPose(0, 0, 0);
-	//pidTurnTune();
-	redBottom();
+	chassis.moveToPoint(0, 6, 2000);
+	//pidTurnTune();'
+	// justinsawp();
+	// redBottom();
 }
 
 
@@ -649,7 +705,9 @@ void opcontrol() {
 			IntakeReverse();
 		}
 		else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_L2)){
-			// intakeMiddlegoal();
+			intakeHighgoal();
+			intakeLift=false;
+			indexing=false;
 		}
 		else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_L1)){
 			intakeHighgoal();
