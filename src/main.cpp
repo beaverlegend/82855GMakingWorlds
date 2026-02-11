@@ -469,11 +469,11 @@ void adjustIntake()
 }
 
 // intake FUNCTIONS
-int speed = 0;
+// int speed = 0;
 void intakeHighgoal()
 {
-	speed = 127;
-	// Intake_High_mg.move(-127);
+	// speed = 127;
+	Intake_High_mg.move(-127);
 	// intakeLift = true;
 	// adjustIntake();
 }
@@ -487,27 +487,27 @@ void intakeMiddlegoal()
 }
 
 void IntakeSlowReverse(){
-	speed = -100;
-	// Intake_High_mg.move(100);
+	// speed = -100;
+	Intake_High_mg.move(100);
 }
 void IntakeReverse()
 {
-	speed=-127;
-	// Intake_High_mg.move(127);
+	// speed=-127;
+	Intake_High_mg.move(127);
 }
 
 void intakeStop()
 {
-	speed = 0;
-	// Intake_High_mg.move(0);
+	// speed = 0;
+	Intake_High_mg.move(0);
 }
-void moveIntake()
-{
-	Intake_High_mg.move(speed);
-}
-void antijam(){
+// void moveIntake()
+// {
+// 	Intake_High_mg.move(speed);
+// }
+// void antijam(){
 
-}
+// }
 //AUTON CODES
 
 void pidforwardTune()
@@ -596,59 +596,68 @@ void redBottom(){
 
 void justinsawp(){
 	chassis.setPose(-48, -15, 180);
-    chassis.moveToPoint(-48, -47, 400);
-    pros::delay(1000);
-    intakeHighgoal();
-    chassis.turnToHeading(270, 300);
-    pros::delay(1000);
-    tonguePress=true;
-    adjustTongue();
-    indexing=true;
-    adjustIndex();
-    chassis.moveToPoint(-58, -47, 300);
-    pros::delay(3000);
-    intakeLift=true;
-    adjustIntake();
-    chassis.moveToPoint(-30, 47, 500, {.forwards=false});
-    indexing=false;
-    adjustIndex();
-    pros::delay(10000);
-    // tonguePress
-    //raise index
+	chassis.moveToPoint(-48, -47, 400);
+	pros::delay(200);
+	intakeHighgoal();
+	chassis.turnToHeading(270, 300);
+	pros::delay(200);
+	//scraper down or smth
+	//intake on
+	chassis.moveToPoint(-58, -47, 300);
+	pros::delay(3000);
+	intakeLift=true;
+	adjustIntake();
+	chassis.moveToPoint(-30, 47, 500, {.forwards=false});
+	//lower index
+	pros::delay(3000);
+	//scraper up
+	//raise index
+	chassis.moveToPoint(-35, -47, 200);
+	intakeLift=false;
+	adjustIntake();
+	pros::delay(200);
+	chassis.turnToHeading(30, 300);
+	pros::delay(300);
+	chassis.moveToPoint(-22, -23, 700);
+	pros::delay(600);
+	chassis.turnToHeading(0, 300);
+	pros::delay(500);
+	chassis.moveToPoint(-23.5, 23, 300);
+	pros::delay(500);
+	chassis.turnToHeading(310, 500);
+	pros::delay(500);
+	chassis.moveToPoint(-10, 10, 500, {.forwards=false});
+	pros::delay(500);
+	//lower index
+	pros::delay(2000);
+	chassis.moveToPoint(-47, 46, 700);
+	pros::delay(500);
+	chassis.turnToHeading(270, 500);
+	//raise index
+	pros::delay(500);
+	//scraper down
+	chassis.moveToPoint(-58, 46, 500);
+	pros::delay(3000);
+	intakeLift=true;
+	adjustIntake();
+	chassis.moveToPoint(-30, 46, 500);
+	pros::delay(300);
+	//lower index
 
-    /*
-    chassis.moveToPoint(-35, -47, 200);
-    intakeLift=false;
-    adjustIntake();
-    pros::delay(200);
-    chassis.turnToHeading(30, 300);
-    pros::delay(300);
-    chassis.moveToPoint(-22, -23, 700);
-    pros::delay(600);
-    chassis.turnToHeading(0, 300);
-    pros::delay(500);
-    chassis.moveToPoint(-23.5, 23, 300);
-    pros::delay(500);
-    chassis.turnToHeading(310, 500);
-    pros::delay(500);
-    chassis.moveToPoint(-10, 10, 500, {.forwards=false});
-    pros::delay(500);
-    //lower index
-    pros::delay(2000);
-    chassis.moveToPoint(-47, 46, 700);
-    pros::delay(500);
-    chassis.turnToHeading(270, 500);
-    //raise index
-    pros::delay(500);
-    //scraper down
-    chassis.moveToPoint(-58, 46, 500);
-    pros::delay(3000);
-    intakeLift=true;
-    adjustIntake();
-    chassis.moveToPoint(-30, 46, 500);
-    pros::delay(300);
-    //lower index
-    */
+}
+
+void LeftSide(){
+	chassis.setPose(-49,16,80);
+	pros::delay(100);
+	intakeHighgoal();
+	chassis.moveToPoint(-26,23,500, {.maxSpeed = 80});
+	pros::delay(500);
+	chassis.moveToPose(-11,11,135,1000, {.lead = 0.2, .maxSpeed = 80 });
+
+
+	
+	
+	
 }
 
 void autonomous() {
@@ -735,7 +744,7 @@ void opcontrol() {
 		adjustWing();
 		adjustIndex();
 		adjustIntake();
-		moveIntake();
+		// moveIntake();
 		// mclLoop();
 		pros::delay(20);  
 		                             // Run for 20 ms then update
