@@ -9,32 +9,32 @@
 #define WHEEL_DIAMETER 3.25
 #define DRIVE_RPM 450
 
-#define LEFT_FRONT_DRIVE 16
-#define LEFT_MIDDLE_DRIVE -17
-#define LEFT_BACK_DRIVE -18
+#define LEFT_FRONT_DRIVE -18
+#define LEFT_MIDDLE_DRIVE 17
+#define LEFT_BACK_DRIVE -16
 
-#define RIGHT_FRONT_DRIVE 11 
-#define RIGHT_MIDDLE_DRIVE -12
-#define RIGHT_BACK_DRIVE 13
+#define RIGHT_FRONT_DRIVE 8 
+#define RIGHT_MIDDLE_DRIVE -6
+#define RIGHT_BACK_DRIVE 7
 
-#define VERTICAL_ODOM 9
-#define IMU 20
+#define VERTICAL_ODOM 2
+#define IMU 21
 
 
-#define IntakeRight -1
+#define IntakeRight -20
 #define IntakeLeft 10
 
-#define TONGUE 'H' // change this
-#define WINGS 'A'
-#define INDEX 'E'
-#define INTAKE 'G'
+#define TONGUE 'E' // change this
+#define WINGS 'C'
+#define INDEX 'F'
+#define INTAKE 'B'
 
 // #define DIST_FRONT 11
 // #define DIST_BACK 12
 // #define DIST_LEFT 13
 // #define DIST_RIGHT 14
 
-inline MockIMU imu(IMU, 359.0/ 360.0);
+inline MockIMU imu(IMU, 358.5/ 360.0);
 inline pros::MotorGroup left_mg({LEFT_FRONT_DRIVE, LEFT_MIDDLE_DRIVE, LEFT_BACK_DRIVE}, pros::MotorGearset::blue);
 inline pros::MotorGroup right_mg({RIGHT_FRONT_DRIVE, RIGHT_MIDDLE_DRIVE, RIGHT_BACK_DRIVE}, pros::MotorGearset::blue);
 inline pros::MotorGroup Intake_High_mg({IntakeRight, IntakeLeft});
