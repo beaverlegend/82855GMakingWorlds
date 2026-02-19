@@ -19,15 +19,16 @@
 
 #define VERTICAL_ODOM 2
 #define IMU 21
+#define DistanceSensorFront 0
+#define DistanceSensorSide 0
 
-
-#define IntakeRight -20
+#define IntakeRight 20
 #define IntakeLeft 10
 
-#define TONGUE 'E' // change this
-#define WINGS 'C'
+#define TONGUE 'B' // change this
+#define WINGS 'E'
 #define INDEX 'F'
-#define INTAKE 'B'
+#define INTAKE 'C'
 
 // #define DIST_FRONT 11
 // #define DIST_BACK 12
@@ -42,7 +43,8 @@ inline pros::MotorGroup Intake_High_mg({IntakeRight, IntakeLeft});
 // inline pros::MotorGroup Intake_Bottom({-IntakeTopRoller});
 // inline pros::MotorGroup Intake_Top({-IntakeLastWheel});
 inline pros::Rotation vertical_odom(VERTICAL_ODOM);
-
+inline pros::Distance frontDistance(DistanceSensorFront);
+inline pros::Distance leftDistance(DistanceSensorSide);
 // pneumatics
 
 inline pros::adi::Pneumatics tongue(TONGUE, false);

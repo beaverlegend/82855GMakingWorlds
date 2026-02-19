@@ -441,6 +441,67 @@
 	 * will be stopped. Re-enabling the robot will restart the task, not re-start it
 	 * from where it left off.
 	 */
+//reset postion COde
+// 1. Helper to get a "Clean" distance using a Normal Distribution approach
+// We take multiple samples to find the stable mean.
+double getNormalDistributedDistance(pros::Distance& sensor) {
+    double sum = 0;
+    int samples = 10;
+    int valid_samples = 0;
+
+    for(int i = 0; i < samples; i++) {
+        double dist = sensor.get_distance();
+        
+        // V5 sensors return 9999 or 0 when they fail/glitch
+        if(dist > 0 && dist < 3000) { 
+            sum += dist;
+            valid_samples++;
+        }
+        pros::delay(10); // Small delay so we don't read the exact same photon bounce
+    }
+
+    if (valid_samples == 0) return -1; // Return error if sensor is blocked/disconnected
+    
+    // Mean of the distribution converted to inches
+    return (sum / valid_samples) / 25.4;
+}
+
+// 2. The Reset Function
+void resetPoseWithSensors() {
+    // These constants should be measured from the center of your robot 
+    // to the face of the sensor.
+    const double FRONT_OFFSET = 4.0; 
+    const double SIDE_OFFSET = 3.5;  
+
+    // Get our "cleaned" values
+    double frontDist = getNormalDistributedDistance(frontDistance);
+    double sideDist = getNormalDistributedDistance(leftDistance);
+
+    // If sensors are glitching, exit the function to avoid teleporting the robot to (0,0)
+    if (frontDist == -1 || sideDist == -1) return;
+
+    // Get current heading to handle the trig
+    // LemLib uses degrees; we need Radians for C++ math
+    double thetaRad = chassis.getPose().theta * M_PI / 180.0;
+
+    // Calculate unit vectors based on current heading
+    double Fy = cos(thetaRad); // Forward component
+    double Rx = cos(thetaRad); // Right/Side component (assuming sensor faces Left)
+
+    /* LOGIC:
+       If frontDist is measured against the North wall (Y = 72):
+       True Y = 72 - (Distance + Offset) * cos(theta)
+       
+       If sideDist is measured against the West wall (X = -72):
+       True X = -72 + (Distance + Offset) * sin(theta) 
+    */
+    
+    double trueY = 72.0 - (frontDist + FRONT_OFFSET) * Fy;
+    double trueX = -72.0 + (sideDist + SIDE_OFFSET) * sin(thetaRad);
+
+    // Apply the new coordinates to LemLib while keeping the current IMU heading
+    chassis.setPose(trueX, trueY, chassis.getPose().theta);
+}
 
 	void toggleWing() // lift or lower intake
 	{
@@ -485,7 +546,7 @@
 
 	void intakeMiddlegoal()
 	{
-		Intake_High_mg.move(-50);
+		Intake_High_mg.move(-70);
 		// intakeLift = false;
 		// indexing=false;
 		// adjustIntake();
@@ -551,7 +612,16 @@
 			
 		}
 	}
+void DistanceSensorTest(){
+	chassis.moveToPoint(0, 60, 1000);
 
+	pros::delay(200);
+
+	resetPoseWithSensors();
+
+	chassis.moveToPoint(30, 30, 1000);
+
+}
 	void redBottom(){
 		// adjustWing();
 		//start
@@ -698,31 +768,31 @@
 		chassis.setPose(-48, -15, 180);
 
 		//matchload 1
-		chassis.moveToPoint(-48, -45, 1000);
+		chassis.moveToPoint(-48, -46, 1000);
 		pros::delay(1000);
 		intakeHighgoal();
 		chassis.turnToHeading(270, 800, {.maxSpeed = 90});
 		tonguePress=true;
 		adjustTongue();
 		pros::delay(800);
-		chassis.moveToPoint(-64, -45, 920, {.maxSpeed=80});
+		chassis.moveToPoint(-64, -46, 980, {.maxSpeed=80});
 		intakeLift=true;
 		adjustIntake();
-		pros::delay(920);
+		pros::delay(980);
 
 		//score 4 balls
-		chassis.moveToPoint(-28, -45, 1100, {.forwards=false});
-		pros::delay(900);
+		chassis.moveToPoint(-28, -46, 1100, {.forwards=false});
+		pros::delay(1100);
 		indexing=false;
 		adjustIndex();
-		pros::delay(1600);
+		pros::delay(3000);
 
 		//setup position
 		tonguePress=false;
 		adjustTongue();
 		indexing=true;
 		adjustIndex();
-		chassis.moveToPoint(-42, -45, 500);
+		chassis.moveToPoint(-42, -46, 500);
 		intakeLift=false;
 		adjustIntake();
 
@@ -735,9 +805,11 @@
 		chassis.moveToPoint(-25, -21, 500, {.maxSpeed  = 70});
 		pros::delay(1000);
 
-		chassis.moveToPoint(-20, -16, 600, {.maxSpeed=60});
+		chassis.moveToPoint(-10.5, -12, 600, {.maxSpeed=60});
 		pros::delay(800);
-		IntakeReverse();
+		chassis.turnToHeading(34, 800);
+		pros::delay(800);
+		IntakeSlowReverse();
 
 	}
 
@@ -893,11 +965,11 @@
 	}
 
 	void autonomous() {
-		
+		//chassis.moveToPoint(0,8,1000);
 		// pidTurnTune();
 		//justinsawp();
-		justinLS();
-		//justinRS();
+		//justinLS();
+	justinRS();
 		//skills();
 		// redBottom();
 	}
@@ -930,7 +1002,7 @@
 
 			// Arcade control scheme
 			int dir = master.get_analog(ANALOG_LEFT_Y);    // Gets amount forward/backward from left joystick
-			int turn = master.get_analog(ANALOG_RIGHT_X);  // Gets the turn left/right from right joystick
+			int turn = (int)(0.8*master.get_analog(ANALOG_RIGHT_X));  // Gets the turn left/right from right joystick
 			
 			
 			left_mg.move(dir + turn);                      // Sets left motor voltage
@@ -968,11 +1040,8 @@
 			// if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_RIGHT )){
 			// 	toggleIntake();
 			// }
-			if (master.get_digital(pros::E_CONTROLLER_DIGITAL_Y)){
-				wingLift=true;
-			}
-			else{
-				wingLift=false;
+			if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_Y)){
+				toggleWing();
 			}
 			// else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_RIGHT)){
 			// 	IntakeScore();
