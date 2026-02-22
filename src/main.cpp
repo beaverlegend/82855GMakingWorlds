@@ -116,7 +116,7 @@
 	 * All other competition modes are blocked by initialize; it is recommended
 	 * to keep execution time for this mode under a few seconds.
 	 */
-	double scale = 20.6/24.0;
+	double scale = 20.7/24.0;
 	lemlib::Drivetrain drivetrain(&left_mg,					  // left motor group
 								&right_mg,				  // right motor group
 								11,						  // 12 inch track width
@@ -133,9 +133,9 @@
 	);
 
 	// lateral PID controller
-	lemlib::ControllerSettings lateral_controller(8,   // proportional gain (kP)
+	lemlib::ControllerSettings lateral_controller(5.5,   // proportional gain (kP)
 												0,   // integral gain (kI)
-												31.7,  // derivative gain (kD)
+												39,  // derivative gain (kD)
 												0,   // anti windup
 												0,   // small error range, in inches
 												100, // small error range timeout, in milliseconds
@@ -145,9 +145,9 @@
 	); 
 
 	// angular PID controller
-	lemlib::ControllerSettings angular_controller(9.0, // proportional gain (kP)3.2  5.8
+	lemlib::ControllerSettings angular_controller(8.5, // proportional gain (kP)3.2  5.8
 												0,   // integral gain (kI)
-												39,  // derivative gain (kD)28 39.5
+												40,  // derivative gain (kD)28 39.5
 												0,   // anti windup
 												0,   // small error range, in degrees
 												0,   // small error range timeout, in milliseconds
@@ -362,15 +362,27 @@
 
 				// Draw text in white
 				pros::screen::set_pen(0xFFFFFF); // white
+				double frontDistMM = frontDistance.get_distance();
+				double rightDistMM = leftDistance.get_distance();
+
+				// Convert to inches
+				double frontDistIN = frontDistMM / 25.4;
+				double rightDistIN = rightDistMM / 25.4;
+
+				// Print to controller
+				//master.print(0, 0, "F: %.2f %.2f in", frontDistIN, rightDistIN);
+				
+//master.print(1, 0, "R: %.2f in", rightDistIN);
 				// master.print(0, 0, "Th:%.1f", chassis.getPose().theta);
 				master.print(0,0, "XYT: %.1f %.1f %.1f", chassis.getPose().x, chassis.getPose().y, chassis.getPose().theta);
 				pros::screen::print(TEXT_MEDIUM, 0, "X: %.2f", chassis.getPose().x);
 				pros::screen::print(TEXT_MEDIUM, 1, "Y: %.2f", chassis.getPose().y);
 				pros::screen::print(TEXT_MEDIUM, 2, "Th: %.2f", chassis.getPose().theta);
-				pros::screen::print(TEXT_MEDIUM, 3, "wing: %d", wingLift);
-				pros::screen::print(TEXT_MEDIUM, 4, "scraper: %d", tonguePress);
-				pros::screen::print(TEXT_MEDIUM, 5, "intake: %d", intakeLift);
-				pros::screen::print(TEXT_MEDIUM, 6, "index: %d", indexing);
+				pros::screen::print(TEXT_MEDIUM,3 , "F: %.2f %.2f in", frontDistIN, rightDistIN);
+				// pros::screen::print(TEXT_MEDIUM, 3, "wing: %d", wingLift);
+				// pros::screen::print(TEXT_MEDIUM, 4, "scraper: %d", tonguePress);
+				// pros::screen::print(TEXT_MEDIUM, 5, "intake: %d", intakeLift);
+				// pros::screen::print(TEXT_MEDIUM, 6, "index: %d", indexing);
 				
 				
 				// pros::screen::print(TEXT_MEDIUM, 3, "first: %.2f", (local.empty())? -10000.00 : local[0].x);
@@ -470,8 +482,8 @@ double getNormalDistributedDistance(pros::Distance& sensor) {
 void resetPoseWithSensors() {
     // These constants should be measured from the center of your robot 
     // to the face of the sensor.
-    const double FRONT_OFFSET = 4.0; 
-    const double SIDE_OFFSET = 3.5;  
+    const double FRONT_OFFSET = 5.5; 
+    const double SIDE_OFFSET = 5.0;  
 
     // Get our "cleaned" values
     double frontDist = getNormalDistributedDistance(frontDistance);
@@ -486,7 +498,7 @@ void resetPoseWithSensors() {
 
     // Calculate unit vectors based on current heading
     double Fy = cos(thetaRad); // Forward component
-    double Rx = cos(thetaRad); // Right/Side component (assuming sensor faces Left)
+    double Lx = cos(thetaRad); // Right/Side component (assuming sensor faces Left)
 
     /* LOGIC:
        If frontDist is measured against the North wall (Y = 72):
@@ -497,7 +509,7 @@ void resetPoseWithSensors() {
     */
     
     double trueY = 72.0 - (frontDist + FRONT_OFFSET) * Fy;
-    double trueX = -72.0 + (sideDist + SIDE_OFFSET) * sin(thetaRad);
+    double trueX = 72.0 - (sideDist + SIDE_OFFSET) *Lx;
 
     // Apply the new coordinates to LemLib while keeping the current IMU heading
     chassis.setPose(trueX, trueY, chassis.getPose().theta);
@@ -581,7 +593,7 @@ void resetPoseWithSensors() {
 		while (true)
 		{
 			
-			chassis.moveToPoint(0,24, 4000);
+			chassis.moveToPoint(0,48, 4000, {.maxSpeed = 80});
 			pros::delay(4000);
 			chassis.moveToPoint(0,0, 4000, {.forwards = false});
 			pros::delay(4000);
@@ -589,15 +601,15 @@ void resetPoseWithSensors() {
 			pros::delay(4000);
 			chassis.moveToPoint(0,0, 4000, {.forwards = false});
 			pros::delay(4000);
+	
 		}
 	}
 	void pidTurnTune(){
-		master.clear();
-		chassis.setPose(0, 0, 0);
+	
 		while (true)
 		{	
 			
-			chassis.turnToHeading(90, 3000);
+			chassis.turnToHeading(45, 3000);
 			pros::delay(4000);
 			chassis.turnToHeading(0, 3000);
 			pros::delay(4000);
@@ -964,12 +976,91 @@ void DistanceSensorTest(){
 		
 	}
 
+	void ProvSkills(){
+		//Start Position
+		intakeHighgoal();
+		chassis.setPose(-57,-1,270);
+		pros::delay(100);
+		chassis.moveToPoint(-61,-1, 500, {.maxSpeed = 40});
+		pros::delay(500);
+		chassis.moveToPoint(-30, -1, 500, {.maxSpeed = 80});
+		pros::delay(500);
+		chassis.turnToHeading(45,300, {.maxSpeed = 70});
+		pros::delay(300);
+		resetPoseWithSensors();
+
+		//middle Goal
+		//add lien to intake one ball
+		chassis.moveToPoint(-15,-15,500, {.maxSpeed = 80});
+		pros::delay(500);
+		chassis.turnToHeading(135,500, {.maxSpeed = 70});
+		pros::delay(500);
+		intakeMiddlegoal();
+		pros::delay(700);
+		indexing=false;
+		adjustIndex();
+		pros::delay(1000);
+		indexing=true;
+		adjustIndex();
+		intakeHighgoal();
+		
+
+		//MatchLoader1
+		pros::delay(100);
+		chassis.turnToHeading(315,500, {.maxSpeed = 80});
+		pros::delay(500);
+		
+		pros::delay(100);
+		chassis.moveToPose(-56,46, 270, 1500, {.lead = 0.8});
+		pros::delay(300);
+		tonguePress = true;
+		adjustTongue();
+		pros::delay(1500);
+		tonguePress = false;
+		adjustTongue();
+
+		//Move Too other side
+		chassis.moveToPose(-31, 59, 90, 800, {.lead = 0.3});
+		pros::delay(800);
+		chassis.turnToHeading(90,500);
+		pros::delay(500);
+		chassis.moveToPoint(40,59,1000);
+		pros::delay(1000);
+		chassis.turnToHeading(45,500);
+		pros::delay(500);
+		chassis.moveToPoint(-31,46,500, {.maxSpeed = 50});
+		pros::delay(500);
+		chassis.turnToHeading(90,500);
+		pros::delay(500);
+		indexing=false;
+		adjustIndex();
+		pros::delay(2000);
+		indexing=true;
+		adjustIndex();
+
+		//matchloader 2;
+
+		
+		
+
+
+
+	}
+
 	void autonomous() {
+		pros::delay(1000);
+		
+		resetPoseWithSensors();
+		pros::delay(4000);
+		chassis.turnToHeading(45,500);
+		pros::delay(4000);
+		resetPoseWithSensors;
 		//chassis.moveToPoint(0,8,1000);
-		// pidTurnTune();
+		 //pidTurnTune();
+		 //pidforwardTune();
 		//justinsawp();
 		//justinLS();
-	justinRS();
+	//justinRS();
 		//skills();
 		// redBottom();
 	}
@@ -989,6 +1080,11 @@ void DistanceSensorTest(){
 	// 	Intake_Shooter.move(127);
 	// 	Intake_Shooter_Beaver.move(60);
 	// }
+void printDistanceSensors() {
+
+    // Get distance in millimeters
+    
+}
 	void opcontrol() {
 		
 		// mclInitialize();
@@ -996,11 +1092,14 @@ void DistanceSensorTest(){
 		
 
 		while (true) {
+			
+				
 			// pros::lcd::print(0, "%d %d %d", (pros::lcd::read_buttons() & LCD_BTN_LEFT) >> 2,
 			//                  (pros::lcd::read_buttons() & LCD_BTN_CENTER) >> 1,
 			//                  (pros::lcd::read_buttons() & LCD_BTN_RIGHT) >> 0);  // Prints status of the emulated screen LCDs
 
 			// Arcade control scheme
+			
 			int dir = master.get_analog(ANALOG_LEFT_Y);    // Gets amount forward/backward from left joystick
 			int turn = (int)(0.8*master.get_analog(ANALOG_RIGHT_X));  // Gets the turn left/right from right joystick
 			
