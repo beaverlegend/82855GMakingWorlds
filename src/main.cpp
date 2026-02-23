@@ -482,7 +482,7 @@ double getNormalDistributedDistance(pros::Distance& sensor) {
 void resetPoseWithSensors() {
     // These constants should be measured from the center of your robot 
     // to the face of the sensor.
-    const double FRONT_OFFSET = 5.5; 
+    const double FRONT_OFFSET = 8.5; 
     const double SIDE_OFFSET = 5.0;  
 
     // Get our "cleaned" values
@@ -494,7 +494,8 @@ void resetPoseWithSensors() {
 
     // Get current heading to handle the trig
     // LemLib uses degrees; we need Radians for C++ math
-    double thetaRad = chassis.getPose().theta * M_PI / 180.0;
+    double thetaRad = (chassis.getPose().theta + 90) * M_PI / 180.0;
+	
 
     // Calculate unit vectors based on current heading
     double Fy = cos(thetaRad); // Forward component
@@ -508,8 +509,8 @@ void resetPoseWithSensors() {
        True X = -72 + (Distance + Offset) * sin(theta) 
     */
     
-    double trueY = 72.0 - (frontDist + FRONT_OFFSET) * Fy;
-    double trueX = 72.0 - (sideDist + SIDE_OFFSET) *Lx;
+    double trueX = -72.0 + (frontDist + FRONT_OFFSET) * Lx;
+    double trueY = -72.0 + (sideDist + SIDE_OFFSET) * Fy;
 
     // Apply the new coordinates to LemLib while keeping the current IMU heading
     chassis.setPose(trueX, trueY, chassis.getPose().theta);
@@ -979,27 +980,44 @@ void DistanceSensorTest(){
 	void ProvSkills(){
 		//Start Position
 		intakeHighgoal();
-		chassis.setPose(-57,-1,270);
+		chassis.setPose(-54,-0,270);
 		pros::delay(100);
-		chassis.moveToPoint(-61,-1, 500, {.maxSpeed = 40});
-		pros::delay(500);
-		chassis.moveToPoint(-30, -1, 500, {.maxSpeed = 80});
-		pros::delay(500);
-		chassis.turnToHeading(45,300, {.maxSpeed = 70});
-		pros::delay(300);
+		chassis.moveToPoint(-64,-0, 800, {.maxSpeed=90});
+		pros::delay(800);
+		chassis.moveToPoint(-50, -0, 800, {.forwards=false});
+		pros::delay(800);
+		chassis.moveToPoint(-100, -0, 800, {.minSpeed=127});
+		pros::delay(800);
+		chassis.moveToPoint(-54, 0, 400, {.forwards=false});
+		pros::delay(400);
+		chassis.moveToPoint(-100, 0, 400, {.maxSpeed=80});
+		pros::delay(400);
+		chassis.moveToPoint(-22, -0, 700, {.forwards=false});
+		pros::delay(1000);
 		resetPoseWithSensors();
+		pros::delay(100);
+		chassis.moveToPoint(-25, 0, 600, {.forwards= false, .maxSpeed = 80});
+		pros::delay(600);
+		chassis.turnToHeading(225, 600, {.maxSpeed = 70});
+		pros::delay(600);
+		
 
 		//middle Goal
 		//add lien to intake one ball
-		chassis.moveToPoint(-15,-15,500, {.maxSpeed = 80});
-		pros::delay(500);
-		chassis.turnToHeading(135,500, {.maxSpeed = 70});
-		pros::delay(500);
-		intakeMiddlegoal();
+		chassis.moveToPoint(-13,13,700, {.forwards=false, .maxSpeed = 80});
 		pros::delay(700);
+		chassis.turnToHeading(315,600, {.maxSpeed = 70});
+		pros::delay(600);
+		chassis.moveToPoint(-17.3, 17.3, 800);
+		pros::delay(800);
+		chassis.moveToPoint(-12, 12, 1000, {.forwards=false});
+		pros::delay(1000);
+		intakeMiddlegoal();
 		indexing=false;
 		adjustIndex();
-		pros::delay(1000);
+		pros::delay(4000);
+		chassis.moveToPoint(-10, 10, 500, {.forwards=false, .maxSpeed=60});
+		pros::delay(500);
 		indexing=true;
 		adjustIndex();
 		intakeHighgoal();
@@ -1007,36 +1025,41 @@ void DistanceSensorTest(){
 
 		//MatchLoader1
 		pros::delay(100);
-		chassis.turnToHeading(315,500, {.maxSpeed = 80});
-		pros::delay(500);
-		
-		pros::delay(100);
-		chassis.moveToPose(-56,46, 270, 1500, {.lead = 0.8});
+		chassis.moveToPoint(-45, 35, 1000, {.maxSpeed=75});
 		pros::delay(300);
 		tonguePress = true;
 		adjustTongue();
-		pros::delay(1500);
-		tonguePress = false;
-		adjustTongue();
-
+		pros::delay(1400);
+		chassis.turnToHeading(270, 600);
+		pros::delay(600);
+		chassis.moveToPoint(-72, 45, 1500, {.maxSpeed=80});
+		pros::delay(2400);
+//hi
 		//Move Too other side
-		chassis.moveToPose(-31, 59, 90, 800, {.lead = 0.3});
-		pros::delay(800);
-		chassis.turnToHeading(90,500);
+		chassis.moveToPoint(-54, 45, 600, {.forwards=false});
 		pros::delay(500);
-		chassis.moveToPoint(40,59,1000);
-		pros::delay(1000);
-		chassis.turnToHeading(45,500);
+		chassis.turnToHeading(225,500);
 		pros::delay(500);
-		chassis.moveToPoint(-31,46,500, {.maxSpeed = 50});
+		chassis.moveToPoint(-44, 58, 500, {.forwards=false, .maxSpeed=80});
 		pros::delay(500);
-		chassis.turnToHeading(90,500);
+		chassis.turnToHeading(270, 500);
 		pros::delay(500);
-		indexing=false;
-		adjustIndex();
-		pros::delay(2000);
-		indexing=true;
-		adjustIndex();
+		resetPoseWithSensors();
+
+		// pros::delay(2000);
+		// chassis.moveToPose(30, 47, 90, 1000, {.forwards=false, .lead = 0.8});
+
+		// chassis.turnToHeading(45,500);
+		// pros::delay(500);
+		// chassis.moveToPoint(-31,46,500, {.maxSpeed = 50});
+		// pros::delay(500);
+		// chassis.turnToHeading(90,500);
+		// pros::delay(500);
+		// indexing=false;
+		// adjustIndex();
+		// pros::delay(2000);
+		// indexing=true;
+		// adjustIndex();
 
 		//matchloader 2;
 
@@ -1048,21 +1071,23 @@ void DistanceSensorTest(){
 	}
 
 	void autonomous() {
-		pros::delay(1000);
+		//pros::delay(1000);
 		
-		resetPoseWithSensors();
-		pros::delay(4000);
-		chassis.turnToHeading(45,500);
-		pros::delay(4000);
-		resetPoseWithSensors;
+		// resetPoseWithSensors();
+		// pros::delay(4000);
+		//chassis.turnToHeading(45,500);
+		//chassis.setPose(-54,-0,270);
+		//pros::delay(4000);
+		//resetPoseWithSensors();
 		//chassis.moveToPoint(0,8,1000);
 		 //pidTurnTune();
 		 //pidforwardTune();
 		//justinsawp();
 		//justinLS();
-	//justinRS();
+		//justinRS();
 		//skills();
 		// redBottom();
+		ProvSkills();
 	}
 
 
