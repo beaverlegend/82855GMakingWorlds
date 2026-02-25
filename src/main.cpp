@@ -564,6 +564,13 @@ void resetPoseWithSensors() {
 		// indexing=false;
 		// adjustIntake();
 	}
+	void intakeMiddlegoalslow()
+	{
+		Intake_High_mg.move(-60);
+		// intakeLift = false;
+		// indexing=false;
+		// adjustIntake();
+	}
 
 	void IntakeSlowReverse(){
 		// speed = -100;
@@ -977,22 +984,49 @@ void DistanceSensorTest(){
 		
 	}
 
+	double nudgeDist = 2.0;
+	void NudgeBot(){
+		double x = chassis.getPose().x;
+		double y = chassis.getPose().y;
+		double theta = chassis.getPose().theta;
+
+		chassis.moveToPoint(x-nudgeDist*sin(theta/180 * M_PI), y-nudgeDist*cos(theta/180 * M_PI), 500, {.forwards=false, .minSpeed=127});
+		pros::delay(500);
+		chassis.moveToPoint(x, y, 300, {.forwards=true, .maxSpeed=90});
+		pros::delay(300);
+		// chassis.setPose(x, y, theta);
+	}
+	void NudgeBotRebound(){
+		double x = chassis.getPose().x;
+		double y = chassis.getPose().y;
+		double theta = chassis.getPose().theta;
+
+		chassis.moveToPoint(x-nudgeDist*sin(theta/180 * M_PI), y-nudgeDist*cos(theta/180 * M_PI), 500, {.forwards=false, .minSpeed=127});
+		pros::delay(500);
+		chassis.moveToPoint(x+1.2*sin(theta/180 * M_PI), y+1.2*cos(theta/180 * M_PI), 300, {.forwards=true, .maxSpeed=90});
+		pros::delay(300);
+		// chassis.setPose(x, y, theta);
+	}
+	
+
 	void ProvSkills(){
 		//Start Position
 		intakeHighgoal();
 		chassis.setPose(-54,-0,270);
 		pros::delay(100);
-		chassis.moveToPoint(-64,-0, 800, {.maxSpeed=90});
-		pros::delay(800);
+		chassis.moveToPoint(-64,-0, 300, {.maxSpeed=90});
+		pros::delay(300);
 		chassis.moveToPoint(-50, -0, 800, {.forwards=false});
 		pros::delay(800);
-		chassis.moveToPoint(-100, -0, 800, {.minSpeed=127});
-		pros::delay(800);
-		chassis.moveToPoint(-54, 0, 400, {.forwards=false});
-		pros::delay(400);
-		chassis.moveToPoint(-100, 0, 400, {.maxSpeed=80});
-		pros::delay(400);
-		chassis.moveToPoint(-22, -0, 700, {.forwards=false});
+		chassis.moveToPoint(-69.67, -0, 800, {.minSpeed=127});
+		pros::delay(1200);
+		// chassis.moveToPoint(-54, 0, 400, {.forwards=false});
+		// pros::delay(400);
+		// chassis.moveToPoint(-100, 0, 400, {.maxSpeed=80});
+		// pros::delay(400);
+
+		
+		chassis.moveToPoint(-22, -0, 700, {.forwards=false, .maxSpeed=90});
 		pros::delay(1000);
 		resetPoseWithSensors();
 		pros::delay(100);
@@ -1000,6 +1034,8 @@ void DistanceSensorTest(){
 		pros::delay(600);
 		chassis.turnToHeading(225, 600, {.maxSpeed = 70});
 		pros::delay(600);
+
+		
 		
 
 		//middle Goal
@@ -1008,52 +1044,160 @@ void DistanceSensorTest(){
 		pros::delay(700);
 		chassis.turnToHeading(315,600, {.maxSpeed = 70});
 		pros::delay(600);
-		chassis.moveToPoint(-17.3, 17.3, 800);
+		chassis.moveToPoint(-17.35, 17.35, 800);
 		pros::delay(800);
-		chassis.moveToPoint(-12, 12, 1000, {.forwards=false});
-		pros::delay(1000);
-		intakeMiddlegoal();
+		Intake_High_mg.move(-78);
+		chassis.moveToPoint(-12.2, 12.2, 700, {.forwards=false});
+		pros::delay(700);
+		NudgeBot();
+		Intake_High_mg.move(-71);
+		 //middle but fast
 		indexing=false;
 		adjustIndex();
-		pros::delay(4000);
-		chassis.moveToPoint(-10, 10, 500, {.forwards=false, .maxSpeed=60});
+		//nudge middle goal
+		pros::delay(2300);
+		intakeStop();
+		indexing = true;
+		adjustIndex();
+		// chassis.moveToPoint(-11, 11, 600, {.forwards=false, .minSpeed=127});
+		// pros::delay(600);
+		// Intake_High_mg.move(-90);
+		// chassis.moveToPoint(-12, 12, 500, {.minSpeed=100});
+		NudgeBotRebound();
+
+		pros::delay(200);
+
+		Intake_High_mg.move(-72);
+
+		chassis.moveToPoint(-12,12,1000);
+		indexing = false;
+		adjustIndex();
+		
+		//Intake_High_mg.move(-75);
+
+		pros::delay(1600);
+		//NudgeBot();
+		//chassis.moveToPoint(-12, 12, 500);
+		
+		// chassis.moveToPoint(-10, 10, 500, {.forwards=false, .maxSpeed=60});
 		pros::delay(500);
+		pros::delay(2000);//temp
 		indexing=true;
 		adjustIndex();
 		intakeHighgoal();
 		
+		IntakeReverse();//temp
+		pros::delay(2000);
+		intakeStop();
+		pros::delay(10000000);//temp
 
 		//MatchLoader1
 		pros::delay(100);
-		chassis.moveToPoint(-45, 35, 1000, {.maxSpeed=75});
+		chassis.moveToPoint(-40, 38, 1000, {.maxSpeed=85});
 		pros::delay(300);
 		tonguePress = true;
 		adjustTongue();
 		pros::delay(1400);
 		chassis.turnToHeading(270, 600);
 		pros::delay(600);
-		chassis.moveToPoint(-72, 45, 1500, {.maxSpeed=80});
-		pros::delay(2400);
-//hi
+
+		
+		//score 3
+		chassis.moveToPoint(-25,47,1000, {.forwards = false, .maxSpeed = 70});
+		pros::delay(1000);
+		indexing = false;
+		adjustIndex();
+		intakeLift=true;
+		adjustIntake();
+		intakeHighgoal();
+		pros::delay(1500);
+		indexing = true;
+		adjustIndex();
+		
+		//matchloader(actully)
+		chassis.moveToPoint(-74, 45, 2067, {.maxSpeed=60});
+		pros::delay(2067);
+
 		//Move Too other side
-		chassis.moveToPoint(-54, 45, 600, {.forwards=false});
-		pros::delay(500);
-		chassis.turnToHeading(225,500);
-		pros::delay(500);
-		chassis.moveToPoint(-44, 58, 500, {.forwards=false, .maxSpeed=80});
-		pros::delay(500);
-		chassis.turnToHeading(270, 500);
-		pros::delay(500);
+		chassis.moveToPoint(-52, 45, 700, {.forwards=false});
+		pros::delay(700);
+		chassis.turnToHeading(225,400);
+		pros::delay(400);
+		chassis.moveToPoint(-44, 60, 700, {.forwards=false, .maxSpeed=80});
+		intakeStop();
+		pros::delay(700);
+		tonguePress=false;
+		adjustTongue();
+		chassis.turnToHeading(270, 700);
+		pros::delay(700);
 		resetPoseWithSensors();
+		pros::delay(100);
 
 		// pros::delay(2000);
-		// chassis.moveToPose(30, 47, 90, 1000, {.forwards=false, .lead = 0.8});
+		//move to other sude
+		chassis.moveToPoint(44,63, 2000, {.forwards = false, .maxSpeed = 90});
+		pros::delay(2000);
+		resetPoseWithSensors();
+		pros::delay(100);
 
+		chassis.turnToHeading(135,300, {.maxSpeed = 100});
+		
+		//score 6
+		intakeHighgoal();
+		chassis.moveToPoint(52, 51, 1000, {.maxSpeed = 100});
+		pros::delay(1000);
+		chassis.moveToPoint(29,51, 1000, {.forwards = false});
+		pros::delay(1500);
+		indexing = false;
+		adjustIndex();
+		//intakeHighgoal();
+		tonguePress = true;
+		adjustTongue();
+		pros::delay(1300);
+		indexing = true;
+		adjustIndex();
+		pros::delay(100);
+
+		//matchloader 2
 		// chassis.turnToHeading(45,500);
 		// pros::delay(500);
-		// chassis.moveToPoint(-31,46,500, {.maxSpeed = 50});
-		// pros::delay(500);
-		// chassis.turnToHeading(90,500);
+
+		//unload matchloader
+		chassis.moveToPoint(74,51,3267, {.maxSpeed = 60});
+		pros::delay(3267);
+		//score 6
+		chassis.moveToPoint(28,51, 1000, {.forwards = false});
+		pros::delay(700);
+		indexing = false;
+		adjustIndex();
+		pros::delay(2500);
+		tonguePress=false;
+		adjustTongue();
+		chassis.turnToHeading(195, 800);
+		indexing=true;
+		adjustIndex();
+		pros::delay(800);
+		chassis.setPose(27, 35, 195);
+		pros::delay(100);
+		chassis.moveToPoint(23, 23, 800);
+		pros::delay(900);
+		chassis.turnToHeading(225, 700);
+		pros::delay(700);
+		chassis.moveToPoint(12, 12, 800);
+		pros::delay(800);
+		IntakeSlowReverse();
+		pros::delay(2000);
+		intakeStop();
+
+		//intake 4 balls
+		chassis.moveToPoint(23,23,800, {.forwards = false});
+		pros::delay(800);
+		intakeHighgoal();
+		chassis.turnToHeading(180,800);
+		pros::delay(800);
+		chassis.moveToPoint(23,-23, 1200);
+		pros::delay(500);
+		chassis.turnToHeading(135,500);
 		// pros::delay(500);
 		// indexing=false;
 		// adjustIndex();
@@ -1062,7 +1206,8 @@ void DistanceSensorTest(){
 		// adjustIndex();
 
 		//matchloader 2;
-
+		pros::delay(500);
+		intakeStop();
 		
 		
 
@@ -1070,13 +1215,15 @@ void DistanceSensorTest(){
 
 	}
 
+	
+
 	void autonomous() {
 		//pros::delay(1000);
 		
 		// resetPoseWithSensors();
 		// pros::delay(4000);
 		//chassis.turnToHeading(45,500);
-		//chassis.setPose(-54,-0,270);
+		// chassis.setPose(0,0,0);
 		//pros::delay(4000);
 		//resetPoseWithSensors();
 		//chassis.moveToPoint(0,8,1000);
@@ -1087,6 +1234,9 @@ void DistanceSensorTest(){
 		//justinRS();
 		//skills();
 		// redBottom();
+
+		// NudgeBot();
+
 		ProvSkills();
 	}
 
